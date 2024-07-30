@@ -32,6 +32,6 @@ public class Aluno {
 
     @Override
     public String toString() {
-        return "Nome: " + nome.toString() + " - Matrícula:" + matricula;
+        return "Nome: " + nome.toString();
     }
 }
