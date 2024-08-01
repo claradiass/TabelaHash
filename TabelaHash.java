@@ -1,11 +1,10 @@
-import java.lang.reflect.Array;
-
 public class TabelaHash {
     Aluno[] lista;
     private int tamanho;
     public int getTamanho() {
         return tamanho;
     }
+    // 
 
     private int quantidade;
 
