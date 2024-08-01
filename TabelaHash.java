@@ -3,9 +3,13 @@ import java.lang.reflect.Array;
 public class TabelaHash {
     Aluno[] lista;
     private int tamanho;
+    public int getTamanho() {
+        return tamanho;
+    }
+
     private int quantidade;
 
-    private static final Aluno DELETED = new Aluno(-1, "deleted");
+    // private static final Aluno DELETED = new Aluno(-1, "deleted");
 
     public TabelaHash(int tamanhoInicial) {
         this.lista = new Aluno[tamanhoInicial];
@@ -19,68 +23,50 @@ public class TabelaHash {
 
     public void pegarValor(int matricula){
         int hash = hash(matricula);
-
         for (int i = 0; i < lista.length; i++) {
             if (lista[hash] == null) {
                 break; // Se encontrar uma posição vazia, pare a busca
             }
-            if (lista[hash] != DELETED && lista[hash].getMatricula() == matricula) {
+            if (!lista[hash].getNome().equals("DELETED") && lista[hash].getMatricula() == matricula) {
                 System.out.println(lista[hash].getNome());
                 return; // Encerra o método após encontrar o aluno
             }
         }
-    
-        System.out.println("Nenhum aluno com essa matrícula");
-
-        // while (lista[hash] != null) {
-        //     if (lista[hash] != DELETED && lista[hash].getMatricula() == matricula) {
-        //         System.out.println(lista[hash].getNome());
-        //         return;
-        //     }
-        //     hash = (hash + 1) % lista.length;
-        // }
-        // System.out.println("Nenhum aluno com essa matrícula");
-
-
-        // for(Aluno aluno : lista){
-        //     if(aluno != null){
-        //         if(aluno.getMatricula() == matricula){
-        //             System.out.println(aluno);
-        //         }
-        //     }
-            
-        // }
-        
+        System.out.println("Nenhum aluno com essa matrícula");        
     }
 
-    public void inserirValor(String nome, int matricula){
-        int index = hash(matricula);
-        int startIndex = index;
-
-        while (lista[index] != null) {
-            index = (index + 1) % tamanho; // Move para a próxima posição
-            if (index == startIndex) {  // Se voltar ao início, a lista está cheia
-                tamanho += tamanho;
+    private void redimensionar() {
+        Aluno[] tabelaAntiga = lista;
+        int tamanhoAntigo = tamanho;
+    
+        // Dobrar o tamanho da lista
+        tamanho = tamanho * 2;
+        lista = new Aluno[tamanho];
+        quantidade = 0;
+    
+        System.out.println("Redimensionando tabela de tamanho " + tamanhoAntigo + " para " + tamanho);
+    
+        // Re-hash dos elementos antigos
+        for (int i = 0; i < tamanhoAntigo; i++) {
+            if (tabelaAntiga[i] != null) {
+                // Chamada corrigida: primeiro a matrícula, depois o nome
+                inserirValor(tabelaAntiga[i].getMatricula(), tabelaAntiga[i].getNome());
             }
         }
+    }
 
-        lista[index] = new Aluno(matricula, nome); // Insere o novo aluno na posição encontrada
-    
+    public void inserirValor(int matricula, String nome){
 
-        // if(lista[index] != null && lista[index] != DELETED){
+        if (quantidade >= tamanho) {
+            redimensionar();
+        }
 
-
-
-        //     for(int i = index; i < size(); i++){
-        //         if(lista[i] == null){
-        //             lista[i] = new Aluno(matricula, nome);
-        //             return;
-        //         }
-        //     }// esse for está errado
-        //     // caso tenha cabado o tamanho e não encaixado em nenhuma
-        // } else {
-        //     lista[index] = new Aluno(matricula, nome);
-        // }        
+        int posicao = hash(matricula);
+        while (lista[posicao] != null && lista[posicao].getNome().equals("DELETED")) {
+            posicao = (posicao + 1) % tamanho;
+        }
+        lista[posicao] = new Aluno(matricula, nome);
+        quantidade++;        
     }
 
     public void removerValor(int matricula){
@@ -90,10 +76,10 @@ public class TabelaHash {
         // }
         
         for(Aluno aluno : lista){
-            if(aluno != null){
-                if(aluno.getMatricula() == matricula){
-                    lista[index] = DELETED;
-                }
+            if(aluno != null && aluno.getMatricula() == matricula){
+                
+                lista[index] = new Aluno(matricula, "DELETED");
+                
             }
             
         }
@@ -103,7 +89,7 @@ public class TabelaHash {
         for (int i = 0; i < tamanho; i++) {
             if (lista[i] == null) {
                 System.out.println("Bucket " + i + ": null"); // Posição vazia
-            } else if (lista[i] == DELETED) {
+            } else if (lista[i].getNome().equals("DELETED") ) {
                 System.out.println("Bucket " + i + ": DELETED"); // Posição removida
             } else {
                 System.out.println("Bucket " + i + ": " + lista[i]); // Posição ocupada por um aluno
@@ -113,3 +99,7 @@ public class TabelaHash {
 
     
 }
+
+
+
+
